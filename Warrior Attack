@@ -1,0 +1,162 @@
+using UnityEngine;
+using System.Collections;
+
+public class WarriorAttack : MonoBehaviour {
+
+	public int m_PlayerNumber;   
+
+	public LayerMask m_UndeadMask;				//Used to find all Tags that match the Undead type.
+	public Collider m_Presence;				    //Collider that defines the space the character occupies.
+	public Collider m_AttackRange;				//Collider that defines the area of melee attack. 
+	private Collider[] colliders;				//List of colliders that come in contact with out m_AttackRange.
+
+	public float m_AttackDamage;    			//Attack damage per hit.             
+	public float m_ExplosionForce = 0.1f;       //Damage Force.                      
+	public float m_ExplosionRadius = 1.5f;		//Damage Radius.
+
+	public GameObject m_FireSlash;				// The Fire slash animation.
+	private GameObject m_FireSlashInstance;		//Instance of fire slash to be destroyed on deadTime.
+	public Transform m_FireTransform; 			//Location where Fire Slash appears.	
+
+	private int isAttacking = Animator.StringToHash ("isAttacking");	
+	//this value passes the trigger value to the AC.
+	//Passing the HashID is more efficient because in this way
+	//the animator control does not have to wasted time examining
+	//the string but maps the string to an int via hashing.
+	//Its like using a dictionary.
+
+	private string m_FireButton;     			//Fire button 1.Key taht activates Fire Slash.								    
+	public float fireRate;						//Rate of fire.
+	private float nextFire;						//Time where next fire will be shot.
+
+	public GameObject m_FireAura;				// The Fire Aura animation.
+	private GameObject m_FireAuraInstance;		// Instance of fire aura to be destroyed on deadTime.
+	public Transform m_position;				//Location where the aura will spawn and remain.
+
+	private string m_FireButton2;				//Fire button 2. Key that activates the Aura.
+	public float fireRate2;						//Cooldown time of aura.
+	private float nextFire2;					//Time when aura can be activated.
+
+
+	public Animator m_Animator;                 // Reference to the warrior animator component.
+												//Our animation controller uses all types of input int, bolean and trigger.
+
+	// Use this for initialization
+	private void Awake()
+	{
+		m_Animator = GetComponent<Animator> ();//Animatior Component.
+	
+	}
+
+	private void Start()
+	{
+		m_FireButton = "Fire" + m_PlayerNumber;							//Set fire button 1 for the designated player number.
+		m_FireButton2= "Fire"+ m_PlayerNumber+ m_PlayerNumber;			//Set fire button 2 for the designated player number.
+	}
+
+	private void OnTriggerEnter(Collider other)														//Update list when a target enters Triggercollider.
+	{
+		colliders = Physics.OverlapSphere (transform.position, m_ExplosionRadius, m_UndeadMask);	// Find all the Undead in an area around the warrior melee range and add them to a list.
+	}
+
+	private void OnTriggerStay(Collider other)														//Update list when a target stays in contact with Triggercollider.
+	{
+		colliders = Physics.OverlapSphere (transform.position, m_ExplosionRadius, m_UndeadMask);	// Find all the Undead in an area around the warrior melee range and add them to a list.
+
+	}
+
+	private void OnTriggerExit(Collider other)		 												//Update list when a target leaves the Triggercollider.
+	{
+		colliders = Physics.OverlapSphere (transform.position, m_ExplosionRadius, m_UndeadMask);	//Find all the Undead in an area around the warrior melee range and add them to a list.
+	}
+
+	// Update is called once per frame
+	private void Update()
+	{
+		//Test Code Cases
+		//Case 1 colliders array has one element.
+		if (colliders.Length == 1) {
+			string colliderOne = colliders [0].ToString () + Time.time.ToString();
+			Debug.Log (colliderOne);
+		}
+		//Case 2 colliders array has two element.
+		if (colliders.Length == 2) {
+			string colliderOne = colliders [0].ToString ()+ Time.time.ToString();
+			Debug.Log (colliderOne);
+			colliderOne = colliders [1].ToString ()+ Time.time.ToString();
+			Debug.Log (colliderOne);
+		}
+		//Case 3 colliders array has three element.
+		if (colliders.Length == 3) {
+			string colliderOne = colliders [0].ToString ()+ Time.time.ToString();
+			Debug.Log (colliderOne);
+			colliderOne = colliders [1].ToString ()+ Time.time.ToString();
+			Debug.Log (colliderOne);
+			colliderOne = colliders [2].ToString ()+ Time.time.ToString();
+			Debug.Log (colliderOne);
+		}
+			
+		m_position = GetComponent<Transform> ();									//m_position find the transform of the warrior object to be used as parent of fireAura.
+		if (m_FireAuraInstance != null) {											//If the FireAura has been instanciated make it mirror m_positions transform.
+
+			m_FireAuraInstance.transform.SetParent(m_position);
+		}
+
+		if (Input.GetButtonDown(m_FireButton) && Time.time> nextFire)
+		{
+			nextFire = Time.time + fireRate;										// Time.time condition plus adding a fireRate makes sure that only one shot can be fired per second
+
+			//m_Animator.SetBool ("Attack", false);
+			//m_ShootingAudio.Play();
+			Fire();
+
+			if (colliders != null) {
+				for (int i = 0; i < colliders.Length; i++) {						//for loop that deals damage to every undead on contact with our warrior.
+					Rigidbody targetRigidbody = colliders [i].GetComponent<Rigidbody> ();
+				
+					if (!targetRigidbody)
+						continue;
+				
+					//targetRigidbody.AddExplosionForce (m_ExplosionForce, transform.position, m_ExplosionRadius);
+					//force is added
+				
+					UndeadHealth targetHealth = targetRigidbody.GetComponent<UndeadHealth> ();	
+				
+					if (!targetHealth)
+						continue;
+					//Apply damage
+					targetHealth.TakeDamage (m_AttackDamage);
+
+				}
+			}
+		}
+			
+		if (Input.GetButtonDown(m_FireButton2) && Time.time> nextFire2)
+		{
+			nextFire2 = Time.time + fireRate2;
+			// Time.time condition plus adding a fireRate makes sure that only one shot can be fired per second
+			//m_Animator.SetBool ("Attack", false);			
+			Fire2();		
+		}
+	}
+
+	private void Fire()			
+	{
+		//Rigidbody orbInstance = Instantiate(m_Orb, m_FireTransform.position, m_FireTransform.rotation) as Rigidbody;//because instantiate does not return a rigidbody 
+		//orbInstance.velocity = 25f * m_FireTransform.forward;
+		m_FireSlashInstance = Instantiate(m_FireSlash, m_FireTransform.position, m_FireTransform.rotation) as GameObject;	// Instantiate Fire Slash.
+		m_Animator.SetTrigger (isAttacking);
+		//m_Animator.SetBool ("Attack", true);
+		//m_ShootingAudio.clip = m_FireClip;
+		//m_ShootingAudio.Play();		
+	}
+	
+	private void Fire2()			
+	{
+		m_FireAuraInstance = Instantiate(m_FireAura, m_position.position, m_position.rotation) as GameObject;	// Instantiate Fire Aura. Fire Heart.
+		PlayerHealth currentHealth = GetComponent<PlayerHealth>();												//Find the health component of the warrior player.
+		currentHealth.m_CurrentHealth = 20;																		//Heal all of the players missing health.
+		currentHealth.SetHealthUI();																			//Update UI.
+		//m_FireAuraInstance.transform.SetParent(m_position);
+	}
+}

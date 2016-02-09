@@ -1,0 +1,73 @@
+using UnityEngine;
+using System.Collections;
+
+public class OrbExplosion : MonoBehaviour {
+
+	public LayerMask m_UndeadMask;			
+	public ParticleSystem m_ExplosionParticles;       
+	public AudioSource m_ExplosionAudio;              
+	public float m_MaxDamage = 10f;                  
+	public float m_ExplosionForce = 1f;            
+	public float m_MaxLifeTime = 2f;                  
+	public float m_ExplosionRadius = 5f;              
+
+
+	private void Start()
+	{
+		Destroy(gameObject, m_MaxLifeTime);
+	}
+	
+	
+	private void OnTriggerEnter(Collider other)
+	{
+		// Find all the Undead in an area around the shell and damage them.
+		Collider[] colliders = Physics.OverlapSphere(transform.position, m_ExplosionRadius, m_UndeadMask);
+		
+		for(int i = 0; i < colliders.Length; i++)
+		{
+			Rigidbody targetRigidbody = colliders[i].GetComponent<Rigidbody>();
+			
+			if (!targetRigidbody)
+				continue;
+			
+			targetRigidbody.AddExplosionForce(m_ExplosionForce, transform.position, m_ExplosionRadius);
+			//force is added
+			
+			UndeadHealth targetHealth = targetRigidbody.GetComponent<UndeadHealth>();	
+			
+			if (!targetHealth)
+				continue;
+			
+			float damage = CalculateDamage(targetRigidbody.position);
+			
+			//Apply damage
+			targetHealth.TakeDamage(damage);
+		}
+		//play particle system and audio
+		m_ExplosionParticles.transform.parent = null;
+		m_ExplosionAudio.Play();
+		m_ExplosionParticles.Play();
+		
+
+		
+		Destroy(m_ExplosionParticles.gameObject, m_ExplosionParticles.duration);
+		Destroy(gameObject);
+	}
+	
+	
+	private float CalculateDamage(Vector3 targetPosition)
+	{
+		// Calculate the amount of damage a target should take based on it's position.
+		Vector3 explosionToTarget = targetPosition - transform.position;
+		
+		float explosionDistance = explosionToTarget.magnitude;
+		
+		float relativeDistance = (m_ExplosionRadius - explosionDistance) / m_ExplosionRadius;//maximum is radius and minimum 0
+		
+		float damage = relativeDistance * m_MaxDamage; //take damage relative to the distance from center
+		
+		damage = Mathf.Max(0f, damage);//if its negative set it to 0 otherwise leave it
+		
+		return damage;
+	}
+}

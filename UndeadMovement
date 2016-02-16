@@ -1,0 +1,77 @@
+using UnityEngine;
+using System.Collections;
+using System.Collections.Generic;
+
+public class UndeadMovement : MonoBehaviour {
+	
+		Transform player1;              // Reference to the player's 1 position
+		Transform player2;			      	// Reference to the player's 2 position
+		Transform targetPlayer;	    		// Reference to the closest player
+
+		Transform undead;		        		//Local Coordinates for the undead minion
+		
+		UndeadHealth undeadHealth;      // Reference to this enemy's health
+		NavMeshAgent nav;               // Reference to the nav mesh agent
+		
+		void Awake ()
+		{
+			// Set up the references
+
+			player1 = GameObject.FindGameObjectWithTag ("Player1").transform;	
+
+			player2 = GameObject.FindGameObjectWithTag ("Player2").transform;	
+
+			undead = GetComponent<Transform> ();
+			undeadHealth = GetComponent <UndeadHealth> ();
+			nav = GetComponent <NavMeshAgent> ();
+		}
+		
+		void Update ()
+		{
+
+		//TEMPORARY BUG FIX
+		if (player1 == null) {
+			targetPlayer = player2;
+		}
+
+		if (player2 == null) {
+			targetPlayer = player1;
+		}
+
+		if (player1 == null && player2 == null) {
+			nav.enabled = false;
+			targetPlayer = null;
+		}
+
+		//Closest Target Calculations
+		if (player1 != null && player2 != null) {
+			float distance1 = Vector3.Distance (player1.position, undead.position);
+			float distance2 = Vector3.Distance (player2.position, undead.position);
+		 
+			if (distance1 < distance2) {
+
+				targetPlayer = player1;
+				//targetPlayersHealth = player1Health;
+			}
+
+			if (distance2 < distance1) {
+				targetPlayer = player2;
+				//targetPlayersHealth = player2Health;
+			}
+		}
+
+		// If the enemy and the player have health left...
+		if(undeadHealth.m_CurrentHealth > 0 && targetPlayer != null)
+		{
+		// ... set the destination of the nav mesh agent to the closest player.
+		nav.SetDestination (targetPlayer.position);
+		}
+			//// Otherwise...
+			else
+			{
+				// ... disable the nav mesh agent.
+				nav.enabled = false;
+			}
+		}
+		
+}

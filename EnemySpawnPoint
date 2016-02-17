@@ -1,0 +1,51 @@
+using UnityEngine;
+using System.Collections;
+
+public class EnemySpawnPoint : MonoBehaviour
+{
+
+	public GameObject enemy;                // The enemy prefab to be spawned
+	public GameObject Bigenemy;             // The Big enemy prefab to be spawned
+
+	public float spawnTime = 3f;            // How long between each individual spawn
+	public float spawn;			               	// float for moment when spawn starts taking place
+	private int spawnCounter = 0;			      // when spawn counter reaches 5 stop
+
+	public Transform[] spawnPoints;         // An array of the spawn points enemies can spawn from
+
+
+	public GameObject m_shadowSpawnMist;  	      // Shadow Mist where Minions Spawn Last approximately 18secs
+  private GameObject m_shadowSpawnMistInstance; //In which time it will spawn a minion every 3 seconds
+                                              	// making a total wave of 5 minions
+
+
+ 	
+	public Transform shadowSpawn;                   //Position of Shadow Mist Spawn
+	public float shadowSpawnTime = 15f;             //Time at which Shadow Mist Spawns
+
+
+	private void Update()
+	{
+
+   //Shadow mist appears once at shadowSpawnTime
+		if (Mathf.Round(Time.time) == shadowSpawnTime && m_shadowSpawnMistInstance ==null ) {      
+			Debug.Log ("SHADOW MIST APPEAR!");
+			m_shadowSpawnMistInstance = Instantiate (m_shadowSpawnMist, shadowSpawn.position, shadowSpawn.rotation) as GameObject;
+		}
+
+
+		if (Time.time > spawn && spawnCounter < 5) {                                                
+
+			spawn = Time.time + spawnTime;                                                            //Manage spawn interval
+			spawnCounter++;                                                                           //Increment Counter
+
+			int spawnPointIndex = Random.Range (0, spawnPoints.Length);                                         //create a minion at a random location 
+			Instantiate (enemy, spawnPoints[spawnPointIndex].position, spawnPoints[spawnPointIndex].rotation);  //within the spawn points array
+		
+			//when spawnCounter is 1 add an extra minion to the wave
+			if (spawnCounter == 1) {
+				Instantiate (Bigenemy, spawnPoints[spawnPointIndex].position, spawnPoints[spawnPointIndex].rotation);
+			}
+		}
+	}
+}

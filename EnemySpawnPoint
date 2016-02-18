@@ -8,15 +8,14 @@ public class EnemySpawnPoint : MonoBehaviour
 	public GameObject Bigenemy;             // The Big enemy prefab to be spawned
 
 	public float spawnTime = 3f;            // How long between each individual spawn
-	public float spawn;			               	// float for moment when spawn starts taking place
-	private int spawnCounter = 0;			      // when spawn counter reaches 5 stop
+	public float spawn;			// float for moment when spawn starts taking place
+	private int spawnCounter = 0;		// when spawn counter reaches 5 stop spawn; this also controls amount of minions spawned
 
-	public Transform[] spawnPoints;         // An array of the spawn points enemies can spawn from
+	public Transform[] spawnPoints;         // An array of the posible spawn locations within a spawn point  
 
 
 	public GameObject m_shadowSpawnMist;  	      // Shadow Mist where Minions Spawn Last approximately 18secs
-  private GameObject m_shadowSpawnMistInstance; //In which time it will spawn a minion every 3 seconds
-                                              	// making a total wave of 5 minions
+	private GameObject m_shadowSpawnMistInstance; //In which time it will spawn a minion every 3 seconds for the duration
 
 
  	
@@ -27,22 +26,25 @@ public class EnemySpawnPoint : MonoBehaviour
 	private void Update()
 	{
 
-   //Shadow mist appears once at shadowSpawnTime
+		 //Shadow mist appears once at shadowSpawnTime
 		if (Mathf.Round(Time.time) == shadowSpawnTime && m_shadowSpawnMistInstance ==null ) {      
 			Debug.Log ("SHADOW MIST APPEAR!");
+			//shadowSpawnMistInstance must be destroyed after duration is finished
 			m_shadowSpawnMistInstance = Instantiate (m_shadowSpawnMist, shadowSpawn.position, shadowSpawn.rotation) as GameObject;
 		}
 
 
 		if (Time.time > spawn && spawnCounter < 5) {                                                
-
-			spawn = Time.time + spawnTime;                                                            //Manage spawn interval
-			spawnCounter++;                                                                           //Increment Counter
-
-			int spawnPointIndex = Random.Range (0, spawnPoints.Length);                                         //create a minion at a random location 
-			Instantiate (enemy, spawnPoints[spawnPointIndex].position, spawnPoints[spawnPointIndex].rotation);  //within the spawn points array
+			//Manage spawn interval
+			spawn = Time.time + spawnTime;       
+			//Increment Counter
+			spawnCounter++;                                                                          
+			
+			//create a minion at a random location within the spawnPoints array
+			int spawnPointIndex = Random.Range (0, spawnPoints.Length);                                         
+			Instantiate (enemy, spawnPoints[spawnPointIndex].position, spawnPoints[spawnPointIndex].rotation);  
 		
-			//when spawnCounter is 1 add an extra minion to the wave
+			//when spawnCounter is 1 add a Big minion to the wave
 			if (spawnCounter == 1) {
 				Instantiate (Bigenemy, spawnPoints[spawnPointIndex].position, spawnPoints[spawnPointIndex].rotation);
 			}

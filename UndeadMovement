@@ -5,10 +5,10 @@ using System.Collections.Generic;
 public class UndeadMovement : MonoBehaviour {
 	
 		Transform player1;              // Reference to the player's 1 position
-		Transform player2;			      	// Reference to the player's 2 position
-		Transform targetPlayer;	    		// Reference to the closest player
+		Transform player2;		// Reference to the player's 2 position
+		Transform targetPlayer;	    	// Reference to the closest player
 
-		Transform undead;		        		//Local Coordinates for the undead minion
+		Transform undead;		//Local Coordinates for the undead minion
 		
 		UndeadHealth undeadHealth;      // Reference to this enemy's health
 		NavMeshAgent nav;               // Reference to the nav mesh agent
@@ -16,7 +16,6 @@ public class UndeadMovement : MonoBehaviour {
 		void Awake ()
 		{
 			// Set up the references
-
 			player1 = GameObject.FindGameObjectWithTag ("Player1").transform;	
 
 			player2 = GameObject.FindGameObjectWithTag ("Player2").transform;	
@@ -60,16 +59,16 @@ public class UndeadMovement : MonoBehaviour {
 			}
 		}
 
-		// If the enemy and the player have health left...
+		// If the enemy and the player have health left
 		if(undeadHealth.m_CurrentHealth > 0 && targetPlayer != null)
 		{
-		// ... set the destination of the nav mesh agent to the closest player.
+		
+		//Set the destination of the nav mesh agent to the closest player
 		nav.SetDestination (targetPlayer.position);
 		}
-			//// Otherwise...
 			else
 			{
-				// ... disable the nav mesh agent.
+				// Disable the nav mesh agent
 				nav.enabled = false;
 			}
 		}

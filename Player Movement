@@ -3,26 +3,26 @@ using System.Collections;
 
 public class PlayerMovement : MonoBehaviour {
 
-	public int m_PlayerNumber;         					//PlayerNumber needed to set up movement controllers.
-	public float m_Speed;        						//Movement Speed.    
-	public float m_TurnSpeed;       					//Turn Speed.
+	public int m_PlayerNumber;         			//PlayerNumber needed to set up movement controllers
+	public float m_Speed;        				//Movement Speed  
+	public float m_TurnSpeed;       			//Turn Speed
 
-	private string m_MovementAxisName;     				//Up and Down axis of movement.
-	private string m_TurnAxisName;         	        	//Rotation value.
-	private float m_MovementInputValue;    				//a float number to declare whether player should be moving.
-	private float m_TurnInputValue; 					//a float number to declare whether player shold be rotating.
+	private string m_MovementAxisName;     			//Up and Down axis of movement
+	private string m_TurnAxisName;         	        	//Rotation value
+	private float m_MovementInputValue;    			//a float number to declare whether player should be moving
+	private float m_TurnInputValue; 			//a float number to declare whether player shold be rotating
 
-	private Rigidbody m_Rigidbody; 						//Reference to the Rigid Component.
-	public Animator m_Animator;							//Reference to the Animator Controller.
+	private Rigidbody m_Rigidbody; 				//Reference to the Rigid Component
+	public Animator m_Animator;				//Reference to the Animator Controller
 
-	//Instantiation of player components.
+	//Instantiation of player components
 	private void Awake()
 	{
 		m_Rigidbody = GetComponent<Rigidbody>();
 		m_Animator = GetComponent<Animator> ();
 	}
 
-	//Default values assigned to some variables.
+	//Default values assigned to some variables
 	private void OnEnable ()
 	{
 		m_Rigidbody.isKinematic = false;
@@ -32,36 +32,37 @@ public class PlayerMovement : MonoBehaviour {
 
 	private void OnDisable ()
 	{
-		m_Rigidbody.isKinematic = true; //When object is kinematic forces, collisions will not affect the rigidbody anymore.
+		m_Rigidbody.isKinematic = true; //When object is kinematic forces, collisions will not affect the rigidbody anymore
 	}
 
 	// Use this for initialization
 	private void Start()
 	{
 		m_MovementAxisName = "Vertical" + m_PlayerNumber; //Player1 or Player2.
-		m_TurnAxisName = "Horizontal" + m_PlayerNumber;
+		m_TurnAxisName = "Horizontal" + m_PlayerNumber;	  //Player1 or Player2.
 		
 	}
 	
 	// Update is called once per frame	
 	private void Update()
 	{
-		// Store the player's input.
+		// Store the player's input
 		m_MovementInputValue = Input.GetAxis(m_MovementAxisName);
 		m_TurnInputValue = Input.GetAxis(m_TurnAxisName);
 		
 	}
 	
+	// This function is called every fixed framerate frame
 	private void FixedUpdate()
 	{
-		// Move and turn the player.
+		// Move and turn the player
 		Move();
 		Turn();
 	}
 
 	private void Move()
 	{
-		// Adjust the position of the wizard based on the player's input.
+		// Adjust the position of the player based on the player's input
 		Vector3 movement = transform.forward * m_MovementInputValue * m_Speed * Time.deltaTime;//deltaTime guarantees actions per second.
 		
 		m_Rigidbody.MovePosition(m_Rigidbody.position + movement);
@@ -71,11 +72,12 @@ public class PlayerMovement : MonoBehaviour {
 		
 	private void Turn()
 	{
-		// Adjust the rotation of the wizard based on the player's input.
+		// Adjust the rotation of the player based on the player's input
 		float turn = m_TurnInputValue * m_TurnSpeed * Time.deltaTime;
 		
 		Quaternion turnRotation = Quaternion.Euler(0f, turn, 0f);
-
-		m_Rigidbody.MoveRotation(m_Rigidbody.rotation * turnRotation); //Quaternion are used when doing math and applying rotations.
+		
+		//Quaternion are used when doing math to apply rotations
+		m_Rigidbody.MoveRotation(m_Rigidbody.rotation * turnRotation);
 	}
 }

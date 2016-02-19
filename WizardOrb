@@ -3,13 +3,13 @@ using System.Collections;
 
 public class OrbExplosion : MonoBehaviour {
 
-	public LayerMask m_UndeadMask;			
-	public ParticleSystem m_ExplosionParticles;       
-	public AudioSource m_ExplosionAudio;              
-	public float m_MaxDamage = 10f;                  
-	public float m_ExplosionForce = 1f;            
-	public float m_MaxLifeTime = 2f;                  
-	public float m_ExplosionRadius = 5f;              
+	public LayerMask m_UndeadMask;			//UndeadMask used to target all Undeads in range		
+	public ParticleSystem m_ExplosionParticles;     //Explosion particle system prefab
+	public AudioSource m_ExplosionAudio;            //Explosion audio source
+	public float m_MaxDamage = 10f;                 // Max damage
+	public float m_ExplosionForce = 1f;             // Explosion force
+	public float m_MaxLifeTime = 2f;		// Explosion duration             
+	public float m_ExplosionRadius = 5f;            // Explosion radius  
 
 
 	private void Start()
@@ -43,13 +43,14 @@ public class OrbExplosion : MonoBehaviour {
 			//Apply damage
 			targetHealth.TakeDamage(damage);
 		}
+		
 		//play particle system and audio
 		m_ExplosionParticles.transform.parent = null;
 		m_ExplosionAudio.Play();
 		m_ExplosionParticles.Play();
 		
 
-		
+		//Destroy explosion prefab after effect is played to keep scene clean
 		Destroy(m_ExplosionParticles.gameObject, m_ExplosionParticles.duration);
 		Destroy(gameObject);
 	}
@@ -57,16 +58,19 @@ public class OrbExplosion : MonoBehaviour {
 	
 	private float CalculateDamage(Vector3 targetPosition)
 	{
-		// Calculate the amount of damage a target should take based on it's position.
+		// Calculate the amount of damage a target should take based on it's position
 		Vector3 explosionToTarget = targetPosition - transform.position;
 		
 		float explosionDistance = explosionToTarget.magnitude;
 		
-		float relativeDistance = (m_ExplosionRadius - explosionDistance) / m_ExplosionRadius;//maximum is radius and minimum 0
+		//maximum is radius and minimum 0
+		float relativeDistance = (m_ExplosionRadius - explosionDistance) / m_ExplosionRadius;
 		
-		float damage = relativeDistance * m_MaxDamage; //take damage relative to the distance from center
+		//take damage relative to the distance from center
+		float damage = relativeDistance * m_MaxDamage; 
 		
-		damage = Mathf.Max(0f, damage);//if its negative set it to 0 otherwise leave it
+		//if its negative set it to 0 otherwise leave it
+		damage = Mathf.Max(0f, damage);
 		
 		return damage;
 	}

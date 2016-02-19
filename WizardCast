@@ -4,33 +4,33 @@ using System.Collections;
 
 public class WizardCast : MonoBehaviour {
 
-	public int m_PlayerNumber;  				//Player Number needed to set up Shooting keys. 
-	public Transform m_FireTransform;    		//The transform where spells will be instantiated.
+	public int m_PlayerNumber;  				//Player Number needed to set up Shooting keys
+	public Transform m_FireTransform;    			//The transform where spells will be instantiated
  
 	//public AudioSource m_ShootingAudio; 	 	
 	//public AudioClip m_FireClip;  	    		
 
-	public Rigidbody m_Orb; 					//RigidBody component of the orb spell.
-	private string m_FireButton;    			//Firebutton 1 corresponding to the orb spell.     
-	public float fireRate;						//Time between Cast.	
-	private float nextFire;						//Time for next cast.
+	public Rigidbody m_Orb; 				//RigidBody component of the orb spell
+	private string m_FireButton;    			//Firebutton 1 corresponding to the orb spell   
+	public float fireRate;					//Time between Cast	
+	private float nextFire;					//Time for next cast
 		
-	public Rigidbody m_ORB;						//Rigidbody component of the ORB spell.
-	private string m_FireButton2;				//Firebutton 2 corresponding to the ORB spell.
-	public float fireRate2;						//Time between cast.
-	private float nextFire2;					//Time for next cast.
+	public Rigidbody m_ORB;					//Rigidbody component of the ORB spell
+	private string m_FireButton2;				//Firebutton 2 corresponding to the ORB spell
+	public float fireRate2;					//Time between cast
+	private float nextFire2;				//Time for next cast
 
-	public Animator m_Animator;					//Animator component of wizard.
+	public Animator m_Animator;				//Animator component of wizard
 
 	private void Awake()
 	{
-		m_Animator = GetComponent<Animator> ();//Referebce to the animator component.
+		m_Animator = GetComponent<Animator> ();		//Referebce to the animator component
 	}
 	
 	private void Start()
 	{
-		m_FireButton = "Fire" + m_PlayerNumber;						//Player 1 or Player 2.
-		m_FireButton2= "Fire"+ m_PlayerNumber+ m_PlayerNumber;		//Player 1 or Player 2.
+		m_FireButton = "Fire" + m_PlayerNumber;				//Player 1 or Player 2
+		m_FireButton2= "Fire"+ m_PlayerNumber+ m_PlayerNumber;		//Player 1 or Player 2
 	}
 		
 	private void Update()
@@ -56,9 +56,10 @@ public class WizardCast : MonoBehaviour {
 		}
 	}	
 	
-	private void Fire()	//Wizard Basic attack.
+	private void Fire()	//Wizard Basic attack
 	{
-		Rigidbody orbInstance = Instantiate(m_Orb, m_FireTransform.position, m_FireTransform.rotation) as Rigidbody;// Instantiate and launch the orb.
+		// Instantiate and launch the orb
+		Rigidbody orbInstance = Instantiate(m_Orb, m_FireTransform.position, m_FireTransform.rotation) as Rigidbody;
 		
 		orbInstance.velocity = 25f * m_FireTransform.forward;
 
@@ -69,9 +70,10 @@ public class WizardCast : MonoBehaviour {
 
 	private void Fire2()	//Wizard Special attack.
 	{
-		Rigidbody ORBInstance = Instantiate(m_ORB, m_FireTransform.position, m_FireTransform.rotation) as Rigidbody;// Instantiate and launch the ORB.
+		// Instantiate and launch the ORB
+		Rigidbody ORBInstance = Instantiate(m_ORB, m_FireTransform.position, m_FireTransform.rotation) as Rigidbody;
 		
-		ORBInstance.velocity = 15f * m_FireTransform.forward; //15f is the amount of force used for the ORB.
+		ORBInstance.velocity = 15f * m_FireTransform.forward; //15f is the amount of force used on the ORB
 		
 		m_Animator.SetBool ("Attack", true);
 		//m_ShootingAudio.clip = m_FireClip;

@@ -6,8 +6,8 @@ public class FireAura : MonoBehaviour {
 	public ParticleSystem m_DamageAuraParticles;		//Destroy Aura Particle system after 12 seconds
 	public ParticleSystem m_DamageAura2Particles;
 
-	public GameObject player2;							//Private Reference to the player game object
-	private Vector3 offset;								// private variable to store the offset distance between the player and the aura
+	public GameObject player2;				//Private Reference to the player game object
+	private Vector3 offset;					// private variable to store the offset distance between the player and the aura
 
 	public float m_MaxLifeTime = 16f;                  
 
